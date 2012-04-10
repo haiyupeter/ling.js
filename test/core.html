@@ -37,42 +37,17 @@
  -->
     <script src="../src/core.js"></script>
     <script src="../src/sizzle/sizzle.js"></script>
+    <script src="../src/sizzle-jquery.js"></script>
     <script src="../src/traversing.js"></script>
+    <script src="../src/support.js"></script>
+    <script src="../src/manipulation.js"></script>
+    <script src="../src/exports.js"></script>
 	<script src="qunit/qunit/qunit.js"></script>
     <!-- 
 	<script src="data/testrunner.js"></script>
  -->
 	<script src="unit/core.js"></script>
     
-    <script>
-    jQuery.each({
-        appendTo: "append",
-        prependTo: "prepend",
-        insertBefore: "before",
-        insertAfter: "after",
-        replaceAll: "replaceWith"
-    }, function( name, original ) {
-        jQuery.fn[ name ] = function( selector ) {
-            var ret = [],
-                insert = jQuery( selector ),
-                parent = this.length === 1 && this[0].parentNode;
-
-            if ( parent && parent.nodeType === 11 && parent.childNodes.length === 1 && insert.length === 1 ) {
-                insert[ original ]( this[0] );
-                return this;
-
-            } else {
-                for ( var i = 0, l = insert.length; i < l; i++ ) {
-                    var elems = ( i > 0 ? this.clone(true) : this ).get();
-                    jQuery( insert[i] )[ original ]( elems );
-                    ret = ret.concat( elems );
-                }
-
-                return this.pushStack( ret, name, insert.selector );
-            }
-        };
-    });
-    </script>
 <!-- <script src="unit/callbacks.js"></script>
 	<script src="unit/deferred.js"></script>
 	<script src="unit/support.js"></script>

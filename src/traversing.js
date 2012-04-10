@@ -1,5 +1,7 @@
 (function( jQuery ) {
-
+ // ?:在正则表达式中表示：非捕获子模式，即使满足parents|prevUntil|prevAll，也不捕获
+ // /,/用于多个选项分隔
+ //
 var runtil = /Until$/,
 	rparentsprev = /^(?:parents|prevUntil|prevAll)/,
 	// Note: This RegExp should be improved, or likely pulled from Sizzle
@@ -19,7 +21,7 @@ jQuery.fn.extend({
 	find: function( selector ) {
 		var self = this,
 			i, l;
-
+		//如果是简单的字符串，则交由filter函数，通过contains函数判断是否需要过滤掉集合同的数据
 		if ( typeof selector !== "string" ) {
 			return jQuery( selector ).filter(function() {
 				for ( i = 0, l = self.length; i < l; i++ ) {
@@ -30,13 +32,16 @@ jQuery.fn.extend({
 			});
 		}
 
+		//将当前对象的所有的selector压入栈中
 		var ret = this.pushStack( "", "find", selector ),
 			length, n, r;
 
 		for ( i = 0, l = this.length; i < l; i++ ) {
 			length = ret.length;
+			// 调用Sizzle进行对象的查找，并将结果保存到ret中，其中Sizzle的定义为：var Sizzle = function( selector, context, results, seed )
 			jQuery.find( selector, this[i], ret );
 
+			// 将重复的搜索对象删除，保证唯一
 			if ( i > 0 ) {
 				// Make sure that the results are unique
 				for ( n = length; n < ret.length; n++ ) {

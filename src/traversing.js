@@ -6,6 +6,7 @@ var runtil = /Until$/,
 	rparentsprev = /^(?:parents|prevUntil|prevAll)/,
 	// Note: This RegExp should be improved, or likely pulled from Sizzle
 	rmultiselector = /,/,
+	// 以任何字符开始，并且后续字符是非# [ . ,的正则表达式
 	isSimple = /^.[^:#\[\.,]*$/,
 	slice = Array.prototype.slice,
 	POS = jQuery.expr.match.globalPOS,
@@ -58,6 +59,7 @@ jQuery.fn.extend({
 		return ret;
 	},
 
+	// 只要包含target中的任何一个对象，即添加到返回列表，filter出来
 	has: function( target ) {
 		var targets = jQuery( target );
 		return this.filter(function() {
@@ -69,14 +71,17 @@ jQuery.fn.extend({
 		});
 	},
 
+	// 将列表推到stack中，方便end()回退
 	not: function( selector ) {
 		return this.pushStack( winnow(this, selector, false), "not", selector);
 	},
 
+	// 将列表推到stack中，方便end()回退
 	filter: function( selector ) {
 		return this.pushStack( winnow(this, selector, true), "filter", selector );
 	},
 
+	// 判断是否是选择器中选择结果的一员
 	is: function( selector ) {
 		return !!selector && (
 			typeof selector === "string" ?
@@ -88,6 +93,7 @@ jQuery.fn.extend({
 				this.filter( selector ).length > 0 );
 	},
 
+	// TODO：这个API可以删除，最近的元素
 	closest: function( selectors, context ) {
 		var ret = [], i, l, cur = this[0];
 
@@ -139,6 +145,7 @@ jQuery.fn.extend({
 
 	// Determine the position of an element within
 	// the matched set of elements
+	// 获取元素的索引
 	index: function( elem ) {
 
 		// No argument, return index in parent
@@ -157,12 +164,15 @@ jQuery.fn.extend({
 			elem.jquery ? elem[0] : elem, this );
 	},
 
+	// 将元素添加进来
 	add: function( selector, context ) {
+	    // 对selector进行简单的判断
 		var set = typeof selector === "string" ?
 				jQuery( selector, context ) :
 				jQuery.makeArray( selector && selector.nodeType ? [ selector ] : selector ),
 			all = jQuery.merge( this.get(), set );
 
+				
 		return this.pushStack( isDisconnected( set[0] ) || isDisconnected( all[0] ) ?
 			all :
 			jQuery.unique( all ) );
@@ -180,10 +190,12 @@ function isDisconnected( node ) {
 }
 
 jQuery.each({
+    // 获取单个父结点
 	parent: function( elem ) {
 		var parent = elem.parentNode;
 		return parent && parent.nodeType !== 11 ? parent : null;
 	},
+	// 获取所有父结点
 	parents: function( elem ) {
 		return jQuery.dir( elem, "parentNode" );
 	},
@@ -246,12 +258,13 @@ jQuery.extend({
 		if ( not ) {
 			expr = ":not(" + expr + ")";
 		}
-
+		// 完全是通过调用sizzle进行过滤，支持not表示“包含内”或者是“包含外”
 		return elems.length === 1 ?
 			jQuery.find.matchesSelector(elems[0], expr) ? [ elems[0] ] : [] :
 			jQuery.find.matches(expr, elems);
 	},
 
+	// cur属于一个递归的调用过程，不断的将递归的结果放到cur里面，并添加到matched中，这个设计模式用得好
 	dir: function( elem, dir, until ) {
 		var matched = [],
 			cur = elem[ dir ];
@@ -265,6 +278,7 @@ jQuery.extend({
 		return matched;
 	},
 
+	// 获取第几个结点
 	nth: function( cur, result, dir, elem ) {
 		result = result || 1;
 		var num = 0;
@@ -278,6 +292,7 @@ jQuery.extend({
 		return cur;
 	},
 
+	// 递归获取兄弟结点，返回数组
 	sibling: function( n, elem ) {
 		var r = [];
 
@@ -297,30 +312,34 @@ function winnow( elements, qualifier, keep ) {
 	// Can't pass null or undefined to indexOf in Firefox 4
 	// Set to 0 to skip string check
 	qualifier = qualifier || 0;
-
+	// grep函数在core.js中，若callback返回true，则elem保留
+	// 如果qualifier为一个函数，则遍历elements，调用qualifier，若返回true，对象elem保留
 	if ( jQuery.isFunction( qualifier ) ) {
 		return jQuery.grep(elements, function( elem, i ) {
 			var retVal = !!qualifier.call( elem, i, elem );
 			return retVal === keep;
 		});
-
+	// 如果qualifier为一个dom结点，则直接比较elem比较
 	} else if ( qualifier.nodeType ) {
 		return jQuery.grep(elements, function( elem, i ) {
 			return ( elem === qualifier ) === keep;
 		});
-
+	// 如果qualifier为string字符串，则
 	} else if ( typeof qualifier === "string" ) {
 		var filtered = jQuery.grep(elements, function( elem ) {
 			return elem.nodeType === 1;
 		});
 
 		if ( isSimple.test( qualifier ) ) {
+		    // 如果以任何字符开始，并且后续字符是非# [ . ,选择器，则直接返回使用sizzle过滤的结果，说明是单层级的
 			return jQuery.filter(qualifier, filtered, !keep);
 		} else {
+		    // 其实这里的逻辑，加上下面的逻辑不就一样了吗？都是返回一个列表
 			qualifier = jQuery.filter( qualifier, filtered );
 		}
 	}
 
+	// 如果elem在qualifier中，则添加到结果中
 	return jQuery.grep(elements, function( elem, i ) {
 		return ( jQuery.inArray( elem, qualifier ) >= 0 ) === keep;
 	});

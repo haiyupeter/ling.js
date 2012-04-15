@@ -1,6 +1,6 @@
 (function( jQuery ) {
  // ?:在正则表达式中表示：非捕获子模式，即使满足parents|prevUntil|prevAll，也不捕获
- // /,/用于多个选项分隔
+ // /,/用于多个选择器分隔
  //
 var runtil = /Until$/,
 	rparentsprev = /^(?:parents|prevUntil|prevAll)/,

@@ -25,6 +25,7 @@ jQuery.support = (function() {
 	a = div.getElementsByTagName( "a" )[ 0 ];
 
 	// Can't get basic test support
+	// 如果不支持getElementsByTagName()方法，则支持返回空对象，
 	if ( !all || !all.length || !a ) {
 		return {};
 	}
@@ -36,22 +37,27 @@ jQuery.support = (function() {
 
 	support = {
 		// IE strips leading whitespace when .innerHTML is used
+	    // IE下.innerHTML将左右空格去除，得到的nodeType === 1
 		leadingWhitespace: ( div.firstChild.nodeType === 3 ),
 
 		// Make sure that tbody elements aren't automatically inserted
 		// IE will insert them into empty tables
+		// IE往空的table添加tbody标签
 		tbody: !div.getElementsByTagName("tbody").length,
 
 		// Make sure that link elements get serialized correctly by innerHTML
 		// This requires a wrapper element in IE
+		// 在IE下查找link的长度为0,需要将link内容包含在dom元素中
 		htmlSerialize: !!div.getElementsByTagName("link").length,
 
 		// Get the style information from getAttribute
 		// (IE uses .cssText instead)
+		// IE中使用a.getAttribute("style").cssText来获取style中的文本信息
 		style: /top/.test( a.getAttribute("style") ),
 
 		// Make sure that URLs aren't manipulated
 		// (IE normalizes it by default)
+		// IE中a的getAttribute方法默认将href属性转义成绝对路径，网上有个网页分析得非常得当
 		hrefNormalized: ( a.getAttribute("href") === "/a" ),
 
 		// Make sure that element opacity exists
@@ -61,11 +67,13 @@ jQuery.support = (function() {
 
 		// Verify style float existence
 		// (IE uses styleFloat instead of cssFloat)
+		// 浏览器的差异
 		cssFloat: !!a.style.cssFloat,
 
 		// Make sure that if no value is specified for a checkbox
 		// that it defaults to "on".
 		// (WebKit defaults to "" instead)
+		// 在chrome中 defaults为on，是否jQuery中有存在问题
 		checkOn: ( input.value === "on" ),
 
 		// Make sure that a selected-by-default option has a working selected property.
@@ -73,15 +81,19 @@ jQuery.support = (function() {
 		optSelected: opt.selected,
 
 		// Test setAttribute on camelCase class. If it works, we need attrFixes when doing get/setAttribute (ie6/7)
+		// 测试是否支持驼峰式的样式，如果支持，在IE6和IE7的get/setAttribute方法中采用attrFixes修正
 		getSetAttribute: div.className !== "t",
 
 		// Tests for enctype support on a form(#6743)
+		// 测试form是否支持enctype
 		enctype: !!document.createElement("form").enctype,
 
 		// Makes sure cloning an html5 element does not cause problems
 		// Where outerHTML is undefined, this still works
+		// 确保克隆一个html5元素时不会导致问题
 		html5Clone: document.createElement("nav").cloneNode( true ).outerHTML !== "<:nav></:nav>",
 
+		// 所以，现在我们不需要这些
 		// Will be defined later
 		submitBubbles: true,
 		changeBubbles: true,
@@ -125,6 +137,7 @@ jQuery.support = (function() {
 
 	// Check if a radio maintains its value
 	// after being appended to the DOM
+	// 加入一个radio后，查看是否仍保留它的值
 	input = document.createElement("input");
 	input.value = "t";
 	input.setAttribute("type", "radio");
@@ -140,6 +153,7 @@ jQuery.support = (function() {
 	fragment.appendChild( div.lastChild );
 
 	// WebKit doesn't clone checked state correctly in fragments
+	// WebKit克隆时不支持checked状态
 	support.checkClone = fragment.cloneNode( true ).cloneNode( true ).lastChild.checked;
 
 	// Check if a disconnected checkbox will retain its checked

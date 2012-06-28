@@ -1,11 +1,18 @@
 (function( jQuery ) {
 
+    // 表单元素，匹配，但不获取textarea, input, select
 var rformElems = /^(?:textarea|input|select)$/i,
+    // 类型名称空间，TODO:
 	rtypenamespace = /^([^\.]*)?(?:\.(.+))?$/,
+	// hover修正
 	rhoverHack = /(?:^|\s)hover(\.\S+)?\b/,
+	// 按钮事件，如keydown, keyup等
 	rkeyEvent = /^key/,
+	// 鼠标事件，如mouseover, mouseout等及右键contextmenu及click事件
 	rmouseEvent = /^(?:mouse|contextmenu)|click/,
+	// 获取及推动焦点
 	rfocusMorph = /^(?:focusinfocus|focusoutblur)$/,
+	// 相当于字符串，或者是#加字符串，或者是.加字符串
 	rquickIs = /^(\w*)(?:#([\w\-]+))?(?:\.([\w\-]+))?$/,
 	quickParse = function( selector ) {
 		var quick = rquickIs.exec( selector );
